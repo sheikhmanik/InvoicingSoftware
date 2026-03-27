@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("staff")
+}
+
+model Business {
+  id                  Int      @id @default(autoincrement())
+  createdAt           DateTime @default(now())
+  name                String
+  address             String
+  location            String
+  GSTIN               String
+  PrimaryContactName  String
+  PrimaryContactPhone String
+  PrimaryContactEmail String
+  brands              Brand[]
+}
+
+model Brand {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  name        String
+  businessId  Int
+  business    Business     @relation(fields: [businessId], references: [id])
+  restaurants Restaurant[]
+}
+
+model Restaurant {
+  id                     Int                     @id @default(autoincrement())
+  createdAt              DateTime                @default(now())
+  name                   String
+  address                String
+  location               String
+  GSTIN                  String
+  FSSAI                  String
+  PrimaryContactName     String
+  PrimaryContactPhone    String
+  brandId                Int
+  brand                  Brand                   @relation(fields: [brandId], references: [id])
+  restaurantPricingPlans RestaurantPricingPlan[]
+  invoices               Invoice[]
+}
+
+model RestaurantPricingPlan {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+
+  restaurantId   Int
+  restaurant     Restaurant @relation(fields: [restaurantId], references: [id])
+
+  pricingPlanId  Int
+  pricingPlan    PricingPlan @relation(fields: [pricingPlanId], references: [id])
+
+  cgst           Boolean  @default(false)
+  sgst           Boolean  @default(false)
+  igst           Boolean  @default(false)
+  addLut         Boolean  @default(false)
+  startDate      DateTime @default(now())
+  planMode       String
+  trialDays      Int?
+  customDuration Int?
+
+  @@unique([restaurantId, pricingPlanId])
+}
+
+model Invoice {
+  id                Int            @id @default(autoincrement())
+  createdAt         DateTime       @default(now())
+
+  restaurantId      Int
+  restaurant        Restaurant     @relation(fields: [restaurantId], references: [id])
+
+  pricingPlanId     Int
+  pricingPlan       PricingPlan    @relation(fields: [pricingPlanId], references: [id])
+
+  subTotalAmount    Float
+  totalAmount       Float
+  partialAmount     Float?
+  remainingAmount   Float?
+  paidAmount        Float?
+  dueDate           DateTime
+  proformaNumber    String?
+  invoiceNumber     String?        @unique
+  paymentDate       DateTime?
+  paymentNotes      String?
+  isPartialPayment  Boolean        @default(false)
+  paymentFileUrl    String?
+  customDuration    Int?
+  displayDate       DateTime?
+  discountAmount    Float?
+
+  status            String         @default("pending")
+}
+
+model PricingPlan {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  planType               String
+  planName               String                  @unique
+  description            String?
+  fixedPrice             Float?
+  basePrice              Float?
+  pricePerCredit         Float?
+  creditsIncluded        Float?
+  billingCycle           Int?
+  validity               Int?
+  meteredProducts        MeteredProduct[]
+  includedProducts       IncludedProduct[]
+  hybridProducts         HybridProduct[]
+  restaurantPricingPlans RestaurantPricingPlan[]
+  invoices               Invoice[]
+}
+
+model FixedPlan {
+  id                     Int                     @id @default(autoincrement())
+  createdAt              DateTime                @default(now())
+  price                  Float
+  billingCycle           Int
+}
+
+model MeteredPlan {
+  id                     Int                     @id @default(autoincrement())
+  createdAt              DateTime                @default(now())
+  price                  Float
+  creditsIncluded        Int
+  billingCycle           Int
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  name             String            @unique
+  license          String?
+  meteredProducts  MeteredProduct[]
+  includedProducts IncludedProduct[]
+  hybridProduct    HybridProduct[]
+  @@unique([name], map: "product_name_ci_unique")
+}
+
+model MeteredProduct {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  planId Int
+  plan   PricingPlan @relation(fields: [planId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  credits  Float
+  isActive Boolean @default(true)
+
+  @@unique([planId, productId])
+}
+
+model IncludedProduct {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  planId Int
+  plan   PricingPlan @relation(fields: [planId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  isActive Boolean @default(true)
+
+  @@unique([planId, productId])
+}
+
+model HybridProduct {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  planId Int
+  plan   PricingPlan @relation(fields: [planId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+
+  unlimitedUsage  Boolean?
+  numberOfUnits   Float?
+  creditsPerUnit  Float?
+
+  isActive Boolean @default(true)
+  @@unique([planId, productId])
+}
