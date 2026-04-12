@@ -8,7 +8,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     command: ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
   db:
     image: postgres:15
@@ -22,6 +23,11 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db_data:

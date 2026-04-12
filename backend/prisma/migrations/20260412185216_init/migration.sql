@@ -1,11 +1,11 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" TEXT NOT NULL DEFAULT 'staff',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -13,6 +13,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Business" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "location" TEXT NOT NULL,
@@ -27,6 +28,7 @@ CREATE TABLE "Business" (
 -- CreateTable
 CREATE TABLE "Brand" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "businessId" INTEGER NOT NULL,
 
@@ -36,6 +38,7 @@ CREATE TABLE "Brand" (
 -- CreateTable
 CREATE TABLE "Restaurant" (
     "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "name" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "location" TEXT NOT NULL,
@@ -61,6 +64,7 @@ CREATE TABLE "RestaurantPricingPlan" (
     "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "planMode" TEXT NOT NULL,
     "trialDays" INTEGER,
+    "customDuration" INTEGER,
 
     CONSTRAINT "RestaurantPricingPlan_pkey" PRIMARY KEY ("id")
 );
@@ -83,6 +87,9 @@ CREATE TABLE "Invoice" (
     "paymentNotes" TEXT,
     "isPartialPayment" BOOLEAN NOT NULL DEFAULT false,
     "paymentFileUrl" TEXT,
+    "customDuration" INTEGER,
+    "displayDate" TIMESTAMP(3),
+    "discountAmount" DOUBLE PRECISION,
     "status" TEXT NOT NULL DEFAULT 'pending',
 
     CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
