@@ -307,46 +307,53 @@ export default function UnpaidInvoices({ allInvoices, latestUnpaidInvoices }: Pr
       </div>
       <div className="flex flex-row items-end justify-end gap-4 my-4">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-          <div className="relative">
+          {/* Dropdown Select */}
+          <div className="relative w-full sm:w-auto">
             <select
               value={dateField}
               onChange={(e) => setDateField(e.target.value as "proformaDate" | "invoiceDate")}
               className="
-                appearance-none   /* HIDE default arrow */
+                w-full sm:w-auto
+                appearance-none 
                 px-3 py-2 
-                pr-10             /* space for custom arrow */
+                pr-10 
                 rounded-md 
                 border border-gray-300 
                 outline-none 
                 focus:ring-2 focus:ring-blue-500 
                 text-sm
+                bg-white
               "
             >
               <option value="proformaDate">Proforma Date</option>
               <option value="invoiceDate">Invoice Date</option>
             </select>
-            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs">
               ▼
             </span>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+
+          {/* Date Inputs Section */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <input
               type="date"
               onClick={(e) => (e.target as HTMLInputElement).showPicker()}
               onChange={(e) => setFromDate(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-white text-sm flex-1 sm:flex-none w-full sm:w-auto focus:ring-2 focus:ring-sky-400 outline-none"
+              className="px-3 py-2 border rounded-md bg-white text-sm w-full sm:w-auto focus:ring-2 focus:ring-sky-400 outline-none"
             />
-            <span className="text-sm text-gray-400">to</span>
+            <span className="text-sm text-gray-400 text-center sm:text-left self-center">to</span>
             <input
               type="date"
               onClick={(e) => (e.target as HTMLInputElement).showPicker()}
               onChange={(e) => setToDate(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-white text-sm flex-1 sm:flex-none w-full sm:w-auto focus:ring-2 focus:ring-sky-400 outline-none"
+              className="px-3 py-2 border rounded-md bg-white text-sm w-full sm:w-auto focus:ring-2 focus:ring-sky-400 outline-none"
             />
           </div>
+
+          {/* Apply Button */}
           <button
             onClick={applyDateFilter}
-            className="bg-sky-600 text-white px-4 py-2 text-sm rounded-md shadow hover:bg-sky-700 transition w-full sm:w-auto"
+            className="bg-sky-600 text-white px-4 py-2 text-sm rounded-md shadow hover:bg-sky-700 transition w-full sm:w-auto font-medium"
           >
             Apply
           </button>

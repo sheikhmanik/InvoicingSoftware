@@ -16,6 +16,7 @@ import CreateInvoice from "./CreateInvoice";
 const API = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Dashboard() {
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState<boolean>(false);
   const [display, setDisplay] = useState<string>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("dashboardView");
@@ -211,30 +212,73 @@ export default function Dashboard() {
     return null;
   };
 
+  const navItems = [
+    "Dashboard", "Customers", "Invoice List", "Create Customer", "Add Business", "Add Brand", "Add Restaurant", "Plan Listing", "Pricing plan setup", "Add Product", "Create Proforma", "Create Invoice", "Pending Invoices", "MRR / ARR", "Churn"
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800">
-      <div className="flex">
+    <div className="min-h-screen bg-gray-50 text-slate-800 flex flex-col md:flex-row">
+      {/* MOBILE HEADER (Visible only on screens smaller than md) */}
+      <header className="md:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-800">Invoice</h2>
+        <button
+          onClick={() => setIsMobileNavOpen((prev) => !prev)}
+          className="p-2 text-gray-600 hover:text-gray-900 focus:outline-none rounded-md hover:bg-gray-100 transition"
+          aria-label="Toggle Navigation Menu"
+        >
+          {isMobileNavOpen ? (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </header>
 
-        {/* SIDEBAR */}
-        <aside className="w-28 sm:w-36 md:w-48 lg:w-56 bg-white border-r border-gray-200 py-6 sticky top-0 h-screen shadow-sm">
-          <h2 className="text-lg font-semibold mb-6 px-6 text-gray-800">Invoice</h2>
+      {/* MOBILE NAV DRAWER (Visible when isMobileNavOpen is true on screens below md) */}
+      {isMobileNavOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3 space-y-1 text-sm shadow-md">
+          {navItems.map((item) => (
+            <a
+              key={item}
+              onClick={() => {
+                setDisplay(item);
+                setIsMobileNavOpen(false);
+              }}
+              className={`${
+                display === item ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-700"
+              } block px-3 py-2 rounded-md hover:bg-gray-100 hover:text-gray-900 transition cursor-pointer`}
+            >
+              {item}
+            </a>
+          ))}
+        </div>
+      )}
 
-          <nav className="space-y-1 text-sm">
-            {[
-              "Dashboard", "Customers", "Invoice List", "Create Customer", "Add Business", "Add Brand", "Add Restaurant", "Plan Listing", "Pricing plan setup", "Add Product", "Create Proforma", "Create Invoice", "Pending Invoices", "MRR / ARR", "Churn"].map((item) => (
-              <a
-                key={item}
-                onClick={() => setDisplay(item)}
-                className={`${display === item && "bg-gray-100"} block px-4 md:pl-6 lg:pl-10 py-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition cursor-pointer`}
-              >
-                {item}
-              </a>
-            ))}
-          </nav>
-        </aside>
+      {/* DESKTOP SIDEBAR (Visible on md and above) */}
+      <aside className="hidden md:block w-48 lg:w-56 bg-white border-r border-gray-200 py-6 sticky top-0 h-screen shadow-sm shrink-0">
+        <h2 className="text-lg font-semibold mb-6 px-6 text-gray-800">Invoice</h2>
 
-        {/* MAIN CONTENT */}
-        <main className="flex-1 p-4 md:p-6">
+        <nav className="space-y-1 text-sm">
+          {navItems.map((item) => (
+            <a
+              key={item}
+              onClick={() => setDisplay(item)}
+              className={`${
+                display === item ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-700"
+              } block px-4 md:pl-6 lg:pl-10 py-2 hover:bg-gray-100 hover:text-gray-900 transition cursor-pointer`}
+            >
+              {item}
+            </a>
+          ))}
+        </nav>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-4 md:p-6 overflow-y-auto">
 
           {display === "Dashboard" && (
             <div>
@@ -377,7 +421,6 @@ export default function Dashboard() {
           )}
 
         </main>
-      </div>
     </div>
   );
 }
